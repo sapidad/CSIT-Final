@@ -33,3 +33,4 @@ RecursionError: maximum recursion depth exceeded while calling a Python object
         - Implement the other required commands
         - Probably review/revise the command line menu (?)
         - Test to make sure everything is working as intended.
+        - Realized that every other attempt at a command closes the program, will do a constant check for everything that isnt one of the commands in the command list to redirect user to always try again.

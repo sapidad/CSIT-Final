@@ -19,5 +19,17 @@ Traceback (most recent call last):
   File "C:/Users/sapidad1/Desktop/pyportable-master/db.py", line 42, in e_conn
     conn = sqlite3.connect(db)
 RecursionError: maximum recursion depth exceeded while calling a Python object
-  
-Erase this line and enter next date when more things are changed and/or tinkered, add log of current additions/changes after putting date.
+
+11/18/2019:
+
+    Implemented:
+        - Database Established
+        - Data inserted into Tables
+        - Existing CWID will bring user into command line, any invalid CWIDs will prompt use to re-enter CWID or type -1
+        - L (List Command) has been implemented (See code as a template to create other commands)
+
+     To Do List:
+        - Create the -1 option on the "Enter Student ID:" which will prompt user with multiple inputs and will create new student based on inputs
+        - Implement the other required commands
+        - Probably review/revise the command line menu (?)
+        - Test to make sure everything is working as intended.

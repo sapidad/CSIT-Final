@@ -28,10 +28,10 @@ def c_student(conn, cwid, sname, grade, gpa):
     cur.execute("INSERT OR IGNORE INTO students(cwid,sname,grade,gpa) VALUES(?,?,?,?)", student)
     return cur.lastrowid
 
-def c_enroll(conn, cwid, cid, denroll, grade):
-    studentenroll = (cwid, cid, denroll, grade)
+def c_enroll(conn, eid, cwid, cid, denroll, grade):
+    studentenroll = (eid, cwid, cid, denroll, grade)
     cur = conn.cursor()
-    cur.execute("INSERT OR IGNORE INTO enroll(cwid,cid,denroll,grade) VALUES(?,?,?,?)", studentenroll)
+    cur.execute("INSERT OR IGNORE INTO enroll(eid,cwid,cid,denroll,grade) VALUES(?,?,?,?,?)", studentenroll)
     return cur.lastrowid
 
 def c_courses(conn, cid, cname, credits, preq):
@@ -136,9 +136,12 @@ def eclass(conn, cwid):
     else:
         cur.execute("SELECT cid, cwid FROM enroll WHERE cwid=? AND cid=?", (cwid, str(cid)))
         cpis = cur.fetchall()
+        cur.execute("SELECT eid FROM enroll ORDER BY eid DESC LIMIT 1;")
+        leid = str(cur.fetchall())
+        eid = int(re.sub('[^A-Za-z0-9]+', '', leid)) + 1
         if not cpis:
             with conn:
-                c_enroll(conn, cwid, str(cid), str(date.today()), "N/A")
+                c_enroll(conn, str(eid), cwid, str(cid), str(date.today()), "N/A")
             print("Enrollment Complete!")
             cline(conn, cwid)
         else:
@@ -179,6 +182,7 @@ def main():
                                            ); """
 
         sqlc_enroll = """CREATE TABLE IF NOT EXISTS enroll (
+                                           eid integer PRIMARY KEY,
                                            cwid integer,
                                            cid integer,
                                            denroll text,
@@ -202,41 +206,49 @@ def main():
 
         with atmpconn:
             existing_connection = True
-            c_student(atmpconn, "21612390", "David Sapida", "Senior", "3.5")
-            c_student(atmpconn, "21612391", "Andre Stillo", "Senior", "3.7")
-            c_student(atmpconn, "21612392", "John Jingleheimer", "Senior", "3.0")
-            c_student(atmpconn, "21612393", "James WhoDied", "Senior", "1.2")
-            c_student(atmpconn, "21612394", "Totina HotPizzaRolls", "Senior", "4.0")
+            cur = atmpconn.cursor()
+            cur.execute("SELECT * FROM enroll")
+            get = cur.fetchall()
+            if not get:
+                c_student(atmpconn, "21612390", "David Sapida", "Senior", "3.5")
+                c_student(atmpconn, "21612391", "Andre Stillo", "Senior", "3.7")
+                c_student(atmpconn, "21612392", "John Jingleheimer", "Senior", "3.0")
+                c_student(atmpconn, "21612393", "James WhoDied", "Senior", "1.2")
+                c_student(atmpconn, "21612394", "Totina HotPizzaRolls", "Senior", "4.0")
 
-            c_courses(atmpconn, "420", "Cooking Totino's Pizza Rolls 101", "3", "N/A")
-            c_courses(atmpconn, "500", "How to not be a failure in life 101", "3", "N/A")
-            c_courses(atmpconn, "012", "How to prevent James from Dying 101", "3", "N/A")
-            c_courses(atmpconn, "069", "How to do the thing 101", "3", "N/A")
-            c_courses(atmpconn, "777", "How to lose your money in Vegas", "3", "N/A")
+                c_courses(atmpconn, "420", "Cooking Totino's Pizza Rolls 101", "3", "N/A")
+                c_courses(atmpconn, "500", "How to not be a failure in life 101", "3", "N/A")
+                c_courses(atmpconn, "012", "How to prevent James from Dying 101", "3", "N/A")
+                c_courses(atmpconn, "069", "How to do the thing 101", "3", "N/A")
+                c_courses(atmpconn, "777", "How to lose your money in Vegas", "3", "N/A")
 
-            c_enroll(atmpconn, "21612390", "420", "4/20/2020", "A+")
-            c_enroll(atmpconn, "21612390", "500", "4/01/2020", "B+")
-            c_enroll(atmpconn, "21612390", "012", "3/16/2020", "F")
-            c_enroll(atmpconn, "21612390", "069", "3/20/2020", "B")
 
-            c_enroll(atmpconn, "21612391", "420", "4/20/2020", "A+")
-            c_enroll(atmpconn, "21612391", "500", "4/10/2020", "B-")
-            c_enroll(atmpconn, "21612391", "012", "4/15/2020", "C+")
+                c_enroll(atmpconn,"0", "21612390", "420", "4/20/2020", "A+")
+                c_enroll(atmpconn,"1", "21612390", "500", "4/01/2020", "B+")
+                c_enroll(atmpconn,"2", "21612390", "012", "3/16/2020", "F")
+                c_enroll(atmpconn,"3", "21612390", "069", "3/20/2020", "B")
 
-            c_enroll(atmpconn, "21612392", "500", "1/11/2020", "A-")
-            c_enroll(atmpconn, "21612392", "012", "3/22/2020", "B")
-            c_enroll(atmpconn, "21612392", "069", "4/23/2020", "D")
+                c_enroll(atmpconn,"4", "21612391", "420", "4/20/2020", "A+")
+                c_enroll(atmpconn,"5", "21612391", "500", "4/10/2020", "B-")
+                c_enroll(atmpconn,"6", "21612391", "012", "4/15/2020", "C+")
 
-            c_enroll(atmpconn, "21612393", "420", "2/03/2020", "C-")
-            c_enroll(atmpconn, "21612393", "777", "2/01/2020", "D+")
+                c_enroll(atmpconn,"7", "21612392", "500", "1/11/2020", "A-")
+                c_enroll(atmpconn,"8", "21612392", "012", "3/22/2020", "B")
+                c_enroll(atmpconn,"9", "21612392", "069", "4/23/2020", "D")
 
-            c_enroll(atmpconn, "21612394", "420", "4/20/2020", "A+")
+                c_enroll(atmpconn,"10", "21612393", "420", "2/03/2020", "C-")
+                c_enroll(atmpconn,"11", "21612393", "777", "2/01/2020", "D+")
+
+                c_enroll(atmpconn,"12", "21612394", "420", "4/20/2020", "A+")
 
         while(existing_connection == True):
             currentcwid = cwidinp()
             check = checkdb(atmpconn, currentcwid)
-            if check == True:
+            if currentcwid != -1 and check == True:
                 cline(atmpconn, currentcwid)
+            elif currentcwid == -1:
+                print("Use the new student function")
+                #Create new student function
             else:
                 print("There are no records for this CWID in our Database, please type -1 to sign up as a new Student, if your CWID exists please try again.")
 

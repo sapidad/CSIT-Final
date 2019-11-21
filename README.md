@@ -50,6 +50,7 @@ RecursionError: maximum recursion depth exceeded while calling a Python object
         - Implement the other required commands
         - Probably review/revise the command line menu (?)
         - -1 Option for Student ID portion
+        - Potentially (If we have time), I (David) will redo the course table, to have another field for size and will reject the user from enrolling in a course that is full.
      
      Creating Student Function (Requirements, atleast in my opinion)
         - Asks Student for Name, Grade (Freshman, Sophomore, Junior, Senior)

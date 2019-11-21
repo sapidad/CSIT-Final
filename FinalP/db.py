@@ -1,5 +1,6 @@
 import sqlite3
 from sqlite3 import Error
+from datetime import date
 
 def estconn(db):
     try:
@@ -55,25 +56,36 @@ def cwidinp():
         print("Not a valid Student ID, please try again.")
         cwidinp()
 
-def cline(con):
+def cline(con, cwid):
+    cur = con.cursor()
+    cur.execute("SELECT cwid FROM students WHERE cwid=?", (cwid,))
+    cwid = cur.fetchall()
     print("\nWelcome, please type in a command or type commands for help!")
     try:
-        inp = str(input("Please type in a command: "))
-        for i in range(len(inp)):
-            if inp[i].isdigit() == True:
-                print("\nInteger values are not valid commands, try again.")
-                cline(con)
+        while(True):
+            inp = str(input("Please type in a command: "))
+            for i in range(len(inp)):
+                if inp[i].isdigit() == True:
+                    print("\nInteger values are not valid commands, try again.")
+                    cline(con, cwid)
 
-        if inp == 'commands':
-            print("L: Lists all Courses")
-            cline(con)
-        elif not inp.strip():
-            print("Not a valid command, try again.")
-            cline(con)
-        elif inp == 'L':
-            list(con)
-            cline(con)
-        ## elif command: here's where you put the next command
+            if inp == 'commands':
+                print("L: Lists all Courses")
+                print("E: Enrolls Student(s) into a Course")
+                print("W: Withdraw Class")
+                print("S: Search for a Course")
+                print("M: View your Classes")
+                print("X: Exit")
+                cline(con, cwid)
+            elif not inp.strip():
+                print("Not a valid command, try again.")
+                cline(con, cwid)
+            elif inp == 'L':
+                list(con)
+                cline(con, cwid)
+            elif inp == 'E':
+                eclass(con, cwid)
+            ## elif command: here's where you put the next command
     except ValueError:
         print("Not a valid command, try again.")
         cline(con)
@@ -84,6 +96,28 @@ def list(con):
     courserecord = cur.fetchall()
     for all in courserecord:
         print(all)
+
+def eclass(conn, cwid):
+    try:
+     cid = int(input("Please enter a Course ID: "))
+    except ValueError as e:
+        print("Invalid Course ID, please try again.")
+
+    cur = conn.cursor()
+    cur.execute("SELECT cid FROM courses WHERE cid=?", (cid,))
+    records = cur.fetchall()
+    if not records:
+        print("Course does not exist, please try again.")
+        eclass(conn, cwid)
+    else:
+        cur.execute("SELECT cid FROM enroll WHERE cid=? AND cwid=?", (str(cid), str(cwid),))
+        checkifpersoninclass = cur.fetchall()
+        if checkifpersoninclass == True:
+            print("You're already registered in that class!")
+            eclass(conn,cwid)
+        else:
+            c_enroll(conn, str(cwid), str(cid), str(date.today()), "N/A")
+            print("Enrolled complete!")
 
 def main():
         db = r'fdb.db'
@@ -115,11 +149,11 @@ def main():
             c_table(atmpconn, sqlc_students)
             c_table(atmpconn, sqlc_enroll)
             c_table(atmpconn, sqlc_courses)
-
         else:
             print("Database Connection Failed.")
 
         with atmpconn:
+            existing_connection = True
             c_student(atmpconn, "21612390", "David Sapida", "Senior", "3.5")
             c_student(atmpconn, "21612391", "Andre Stillo", "Senior", "3.7")
             c_student(atmpconn, "21612392", "John Jingleheimer", "Senior", "3.0")
@@ -150,13 +184,13 @@ def main():
 
             c_enroll(atmpconn, "21612394", "420", "4/20/2020", "A+")
 
-        check = checkdb(atmpconn, cwidinp())
-        if check == True:
-            cline(atmpconn)
-        else:
-            print("There are no records for this CWID in our Database, please type -1 to sign up as a new Student, if your CWID exists please try again.")
-            checkdb(atmpconn, cwidinp())
-
+        while(existing_connection == True):
+            currentcwid = cwidinp()
+            check = checkdb(atmpconn, currentcwid)
+            if check == True:
+                cline(atmpconn, currentcwid)
+            else:
+                print("There are no records for this CWID in our Database, please type -1 to sign up as a new Student, if your CWID exists please try again.")
 
 if __name__ == "__main__":
         main()

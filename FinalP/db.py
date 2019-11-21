@@ -135,14 +135,14 @@ def eclass(conn, cwid):
         print("Course does not exist, please try again.")
         eclass(conn, cwid)
     else:
-        cur.execute("SELECT cid, cwid FROM enroll WHERE cwid=? AND cid=?", (cwid, str(cid)))
+        cur.execute("SELECT cid, cwid FROM enroll WHERE cwid=? AND cid=?", (cwid, str(gcid)))
         cpis = cur.fetchall()
         cur.execute("SELECT eid FROM enroll ORDER BY eid DESC LIMIT 1;")
         leid = str(cur.fetchall())
         eid = int(re.sub('[^A-Za-z0-9]+', '', leid)) + 1
         if not cpis:
             with conn:
-                c_enroll(conn, str(eid), cwid, str(cid), str(date.today()), "N/A")
+                c_enroll(conn, str(eid), cwid, str(gcid), str(date.today()), "N/A")
             print("Enrollment Complete!")
             cline(conn, cwid)
         else:
@@ -163,14 +163,14 @@ def wclass(conn, cwid):
         print("Course does not exist, please try again.")
         wclass(conn, cwid)
     else:
-        cur.execute("SELECT cid, cwid FROM enroll WHERE cwid=? AND cid=?", (cwid, str(cid)))
+        cur.execute("SELECT cid, cwid FROM enroll WHERE cwid=? AND cid=?", (cwid, str(gcid)))
         cpis = cur.fetchall()
         if not cpis:
             print("You are not registered for this class!")
             wclass(conn, cwid)
         else:
             with conn:
-                d_enroll(conn, cwid, cid)
+                d_enroll(conn, cwid, gcid)
 
 def main():
         db = r'fdb.db'

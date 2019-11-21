@@ -34,3 +34,23 @@ RecursionError: maximum recursion depth exceeded while calling a Python object
         - Probably review/revise the command line menu (?)
         - Test to make sure everything is working as intended.
         - Realized that every other attempt at a command closes the program, will do a constant check for everything that isnt one of the commands in the command list to redirect user to always try again.
+        
+11/20/2019:
+
+    Implemented:
+        - Fixed multiple bugs regarding termination of the command line after multiple failures/successes after failures
+        - W and E commands have been implemented and are working as intended (until further notice)
+        - FIXED MAJOR BUG where duplicate entries would be entered in to the database when compiling program
+        - Enroll Table in Database has a new PRIMARY KEY (eid)
+        - New Enrollments by Student are entered in the database having the eid of the last entry + 1 (Enrollment ID)
+        - Setup a template in main for partner to work on creating new student function
+
+     To Do List:
+        - Implement the other required commands
+        - Probably review/revise the command line menu (?)
+        - -1 Option for Student ID portion
+     
+     Creating Student Function (Requirements, atleast in my opinion)
+        - Asks Student for Name, Grade (Freshman, Sophomore, Junior, Senior)
+        - Generates a 7-Digit CWID at random and sets their GPA to N/A
+        - Provide user with the CWID and displays the information asking them to confirm if this information is correct or not.

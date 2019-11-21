@@ -44,6 +44,7 @@ RecursionError: maximum recursion depth exceeded while calling a Python object
         - Enroll Table in Database has a new PRIMARY KEY (eid)
         - New Enrollments by Student are entered in the database having the eid of the last entry + 1 (Enrollment ID)
         - Setup a template in main for partner to work on creating new student function
+        - EDIT ON 11/20/2019 @ 11:13PM: Fixed Bug if user incorrectly types a invalid Course ID when being prompted to in W and E commands.
 
      To Do List:
         - Implement the other required commands

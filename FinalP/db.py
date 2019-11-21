@@ -1,6 +1,8 @@
 import sqlite3
 from sqlite3 import Error
 from datetime import date
+import re
+
 
 def estconn(db):
     try:
@@ -38,6 +40,23 @@ def c_courses(conn, cid, cname, credits, preq):
     cur.execute("INSERT OR IGNORE INTO courses(cid,cname,credits,preq) VALUES(?,?,?,?)", course)
     return cur.lastrowid
 
+def d_enroll(conn, cwid, cid):
+    cur = conn.cursor()
+    cur.execute("SELECT E.cwid, E.cid, C.cname FROM enroll E, courses C WHERE E.cid = C.cid AND E.cwid=? AND E.cid=?", (cwid, str(cid),))
+    get = cur.fetchall()
+    print(get)
+    c = str(input("Are you sure you want to withdraw from this class? Please type Y or N: "))
+    if c == 'Y':
+        with conn:
+            cur.execute("DELETE FROM enroll WHERE cwid=? AND cid=?", (cwid, str(cid),))
+            print("Withdrawl Successful")
+    elif c == 'N':
+        print("Withdrawl Failed.")
+        cline(conn, cwid)
+    else:
+        print("Invalid option, please try again.")
+        d_enroll(conn, cwid, cid)
+
 def checkdb(conn, cwid):
     cur = conn.cursor()
     cur.execute("SELECT cwid FROM students WHERE cwid=?", (cwid,))
@@ -59,8 +78,11 @@ def cwidinp():
 def cline(con, cwid):
     cur = con.cursor()
     cur.execute("SELECT cwid FROM students WHERE cwid=?", (cwid,))
-    cwid = cur.fetchall()
+    getcwid = cur.fetchall()
+    s = str(getcwid)
+    cwid = re.sub('[^A-Za-z0-9]+', '', s)
     print("\nWelcome, please type in a command or type commands for help!")
+    print("CWID: " + cwid)
     try:
         while(True):
             inp = str(input("Please type in a command: "))
@@ -85,6 +107,8 @@ def cline(con, cwid):
                 cline(con, cwid)
             elif inp == 'E':
                 eclass(con, cwid)
+            elif inp == 'W':
+                wclass(con, cwid)
             ## elif command: here's where you put the next command
     except ValueError:
         print("Not a valid command, try again.")
@@ -110,14 +134,38 @@ def eclass(conn, cwid):
         print("Course does not exist, please try again.")
         eclass(conn, cwid)
     else:
-        cur.execute("SELECT cid FROM enroll WHERE cid=? AND cwid=?", (str(cid), str(cwid),))
-        checkifpersoninclass = cur.fetchall()
-        if checkifpersoninclass == True:
-            print("You're already registered in that class!")
-            eclass(conn,cwid)
+        cur.execute("SELECT cid, cwid FROM enroll WHERE cwid=? AND cid=?", (cwid, str(cid)))
+        cpis = cur.fetchall()
+        if not cpis:
+            with conn:
+                c_enroll(conn, cwid, str(cid), str(date.today()), "N/A")
+            print("Enrollment Complete!")
+            cline(conn, cwid)
         else:
-            c_enroll(conn, str(cwid), str(cid), str(date.today()), "N/A")
-            print("Enrolled complete!")
+            print("You are currently registered for this class!")
+            eclass(conn, cwid)
+
+def wclass(conn, cwid):
+    try:
+        cid = int(input("Please enter a Course ID: "))
+    except ValueError as e:
+        print("Invalid Course ID, please try again.")
+
+    cur = conn.cursor()
+    cur.execute("SELECT cid FROM courses WHERE cid=?", (cid,))
+    records = cur.fetchall()
+    if not records:
+        print("Course does not exist, please try again.")
+        wclass(conn, cwid)
+    else:
+        cur.execute("SELECT cid, cwid FROM enroll WHERE cwid=? AND cid=?", (cwid, str(cid)))
+        cpis = cur.fetchall()
+        if not cpis:
+            print("You are not registered for this class!")
+            wclass(conn, cwid)
+        else:
+            with conn:
+                d_enroll(conn, cwid, cid)
 
 def main():
         db = r'fdb.db'

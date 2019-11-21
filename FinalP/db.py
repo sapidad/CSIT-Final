@@ -112,7 +112,7 @@ def cline(con, cwid):
             ## elif command: here's where you put the next command
     except ValueError:
         print("Not a valid command, try again.")
-        cline(con)
+        cline(con, cwid)
 
 def list(con):
     cur = con.cursor()
@@ -123,12 +123,13 @@ def list(con):
 
 def eclass(conn, cwid):
     try:
-     cid = int(input("Please enter a Course ID: "))
-    except ValueError as e:
+     gcid = int(input("Please enter a Course ID: "))
+    except ValueError:
         print("Invalid Course ID, please try again.")
+        eclass(conn, cwid)
 
     cur = conn.cursor()
-    cur.execute("SELECT cid FROM courses WHERE cid=?", (cid,))
+    cur.execute("SELECT cid FROM courses WHERE cid=?", (gcid,))
     records = cur.fetchall()
     if not records:
         print("Course does not exist, please try again.")
@@ -150,12 +151,13 @@ def eclass(conn, cwid):
 
 def wclass(conn, cwid):
     try:
-        cid = int(input("Please enter a Course ID: "))
-    except ValueError as e:
+       gcid = int(input("Please enter a Course ID: "))
+    except ValueError:
         print("Invalid Course ID, please try again.")
+        wclass(conn, cwid)
 
     cur = conn.cursor()
-    cur.execute("SELECT cid FROM courses WHERE cid=?", (cid,))
+    cur.execute("SELECT cid FROM courses WHERE cid=?", (gcid,))
     records = cur.fetchall()
     if not records:
         print("Course does not exist, please try again.")

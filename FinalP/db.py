@@ -26,6 +26,7 @@ def c_student(conn, cwid, sname, grade, gpa):
     student = (cwid, sname, grade, gpa)
     cur = conn.cursor()
     cur.execute("INSERT OR IGNORE INTO students(cwid,sname,grade,gpa) VALUES(?,?,?,?)", student)
+    print("Registration successful");
     return cur.lastrowid
 
 def c_enroll(conn, eid, cwid, cid, denroll, grade):
@@ -46,12 +47,12 @@ def d_enroll(conn, cwid, cid):
     get = cur.fetchall()
     print(get)
     c = str(input("Are you sure you want to withdraw from this class? Please type Y or N: "))
-    if c == 'Y':
+    if c.lower() == 'y':
         with conn:
             cur.execute("DELETE FROM enroll WHERE cwid=? AND cid=?", (cwid, str(cid),))
-            print("Withdrawl Successful")
-    elif c == 'N':
-        print("Withdrawl Failed.")
+            print("Withdrawal Successful")
+    elif c.lower() == 'n':
+        print("Withdrawal Failed.")
         cline(conn, cwid)
     else:
         print("Invalid option, please try again.")
@@ -68,14 +69,109 @@ def checkdb(conn, cwid):
 
 
 def cwidinp():
-    try:
-        cwid = int(input("Student ID: "))
-        return cwid
-    except ValueError:
-        print("Not a valid Student ID, please try again.")
-        cwidinp()
+    while (True):
+        try:
+            cwid = int(input("Student ID: "))
+            return cwid
+        except ValueError:
+            print("Not a valid Student ID, please try again.")
 
-def cline(con, cwid):
+def gpainp():
+    while (True):
+        try:
+            gpa = float(input("GPA: "))
+            return gpa
+        except ValueError:
+            print("Not a valid GPA value, please try again.")
+
+def n_student(con):
+    ncwid = cwidinp()
+    nsname = str(input("Student name: "))
+    ngrade = str(input("Grade level: "))
+    ngpa = gpainp()
+    c_student(con, ncwid, nsname, ngrade, ngpa)
+
+def login(con):
+    sqlc_students = """ CREATE TABLE IF NOT EXISTS students (
+                                               cwid integer PRIMARY KEY,
+                                               sname text NOT NULL,
+                                               grade text NOT NULL,
+                                               gpa double NOT NULL
+                                           ); """
+
+    sqlc_enroll = """CREATE TABLE IF NOT EXISTS enroll (
+                                           eid integer PRIMARY KEY,
+                                           cwid integer,
+                                           cid integer,
+                                           denroll text,
+                                           grade text,
+                                           FOREIGN KEY (cwid) REFERENCES students (cwid)
+                                       );"""
+
+    sqlc_courses = """CREATE TABLE IF NOT EXISTS courses (
+                                                   cid integer PRIMARY KEY,
+                                                   cname text NOT NULL,
+                                                   credits integer NOT NULL,
+                                                   preq text
+                                               );"""
+
+    if con is not None:
+        c_table(con, sqlc_students)
+        c_table(con, sqlc_enroll)
+        c_table(con, sqlc_courses)
+    else:
+        print("Database Connection Failed.")
+
+    with con:
+        existing_connection = True
+        cur = con.cursor()
+        cur.execute("SELECT * FROM enroll")
+        get = cur.fetchall()
+        if not get:
+            c_student(con, "21612390", "David Sapida", "Senior", "3.5")
+            c_student(con, "21612391", "Andre Stillo", "Senior", "3.7")
+            c_student(con, "21612392", "John Jingleheimer", "Senior", "3.0")
+            c_student(con, "21612393", "James WhoDied", "Senior", "1.2")
+            c_student(con, "21612394", "Totina HotPizzaRolls", "Senior", "4.0")
+
+            c_courses(con, "420", "Cooking Totino's Pizza Rolls 101", "3", "N/A")
+            c_courses(con, "500", "How to not be a failure in life 101", "3", "N/A")
+            c_courses(con, "012", "How to prevent James from Dying 101", "3", "N/A")
+            c_courses(con, "069", "How to do the thing 101", "3", "N/A")
+            c_courses(con, "777", "How to lose your money in Vegas", "3", "N/A")
+
+
+            c_enroll(con,"0", "21612390", "420", "4/20/2020", "A+")
+            c_enroll(con,"1", "21612390", "500", "4/01/2020", "B+")
+            c_enroll(con,"2", "21612390", "012", "3/16/2020", "F")
+            c_enroll(con,"3", "21612390", "069", "3/20/2020", "B")
+
+            c_enroll(con,"4", "21612391", "420", "4/20/2020", "A+")
+            c_enroll(con,"5", "21612391", "500", "4/10/2020", "B-")
+            c_enroll(con,"6", "21612391", "012", "4/15/2020", "C+")
+
+            c_enroll(con,"7", "21612392", "500", "1/11/2020", "A-")
+            c_enroll(con,"8", "21612392", "012", "3/22/2020", "B")
+            c_enroll(con,"9", "21612392", "069", "4/23/2020", "D")
+
+            c_enroll(con,"10", "21612393", "420", "2/03/2020", "C-")
+            c_enroll(con,"11", "21612393", "777", "2/01/2020", "D+")
+
+            c_enroll(con,"12", "21612394", "420", "4/20/2020", "A+")
+
+    while(existing_connection == True):
+        print("\nEnter your student ID or enter -1 to register as a new student.")
+        currentcwid = cwidinp()
+        check = checkdb(con, currentcwid)
+        if currentcwid != -1 and check == True:
+            welcome(con, currentcwid)
+        elif currentcwid == -1:
+            print("Entering new student into the database...")
+            n_student(con)
+        else:
+           print("There are no records for this CWID in our Database, please type -1 to sign up as a new Student, if your CWID exists please try again.")
+    
+def welcome(con, cwid):
     cur = con.cursor()
     cur.execute("SELECT cwid FROM students WHERE cwid=?", (cwid,))
     getcwid = cur.fetchall()
@@ -83,35 +179,42 @@ def cline(con, cwid):
     cwid = re.sub('[^A-Za-z0-9]+', '', s)
     print("\nWelcome, please type in a command or type commands for help!")
     print("CWID: " + cwid)
-    try:
-        while(True):
-            inp = str(input("Please type in a command: "))
-            for i in range(len(inp)):
-                if inp[i].isdigit() == True:
-                    print("\nInteger values are not valid commands, try again.")
-                    cline(con, cwid)
+    cline(con, cwid)
 
-            if inp == 'commands':
-                print("L: Lists all Courses")
-                print("E: Enrolls Student(s) into a Course")
-                print("W: Withdraw Class")
-                print("S: Search for a Course")
-                print("M: View your Classes")
-                print("X: Exit")
-                cline(con, cwid)
-            elif not inp.strip():
-                print("Not a valid command, try again.")
-                cline(con, cwid)
-            elif inp == 'L':
-                list(con)
-                cline(con, cwid)
-            elif inp == 'E':
-                eclass(con, cwid)
-            elif inp == 'W':
-                wclass(con, cwid)
-            ## elif command: here's where you put the next command
-    except ValueError:
-        print("Not a valid command, try again.")
+         
+def cline(con, cwid):
+    inp = str(input("Please type in a command: "))
+    for i in range(len(inp)):
+        if inp[i].isdigit() == True:
+            print("\nInteger values are not valid commands, try again.")
+            cline(con, cwid)
+
+        if inp == 'commands':
+            print("L: Lists all Courses")
+            print("E: Enrolls Student(s) into a Course")
+            print("W: Withdraw Class")
+            print("S: Search for a Course")
+            print("M: View your Classes")
+            print("X: Exit")
+            print("-: Log Out")
+        elif not inp.strip():
+            print("Not a valid command, try again.")
+        elif inp.lower() == 'l':
+            list(con)
+        elif inp.lower() == 'e':
+            eclass(con, cwid)
+        elif inp.lower() == 'w':
+            wclass(con, cwid)
+        elif inp.lower() == 's':
+            sclass(con)
+        elif inp.lower() == 'm':
+            mclass(con, cwid)
+        elif inp.lower() == 'x':
+            exitapp(con)
+        elif inp == '-': #function i added to return to the login
+            login(con)
+        else:
+            print("Not a valid command, try again.")
         cline(con, cwid)
 
 def list(con):
@@ -123,11 +226,10 @@ def list(con):
 
 def eclass(conn, cwid):
     try:
-     gcid = int(input("Please enter a Course ID: "))
+        gcid = int(input("Please enter a Course ID: "))
     except ValueError:
         print("Invalid Course ID, please try again.")
         eclass(conn, cwid)
-
     cur = conn.cursor()
     cur.execute("SELECT cid FROM courses WHERE cid=?", (gcid,))
     records = cur.fetchall()
@@ -144,7 +246,6 @@ def eclass(conn, cwid):
             with conn:
                 c_enroll(conn, str(eid), cwid, str(gcid), str(date.today()), "N/A")
             print("Enrollment Complete!")
-            cline(conn, cwid)
         else:
             print("You are currently registered for this class!")
             eclass(conn, cwid)
@@ -172,87 +273,29 @@ def wclass(conn, cwid):
             with conn:
                 d_enroll(conn, cwid, gcid)
 
+def sclass(con):
+    gcname = str(input("Enter a string to search the course list for: "))
+    cur = con.cursor()
+    cur.execute("SELECT cname FROM courses WHERE cname LIKE '%s%%'" % gcname)
+    courserecord = cur.fetchall()
+    for all in courserecord:
+        print(all)
+
+def mclass(con, cwid):
+    cur = con.cursor()
+    cur.execute("SELECT c.cname, c.cid FROM courses c, enroll e WHERE E.cwid=? AND e.cid=c.cid", (cwid,))
+    courserecord = cur.fetchall()
+    for all in courserecord:
+        print(all)
+
+def exitapp(con):
+    con.close()
+    quit()
+
 def main():
         db = r'fdb.db'
         atmpconn = estconn(db)
-
-        sqlc_students = """ CREATE TABLE IF NOT EXISTS students (
-                                               cwid integer PRIMARY KEY,
-                                               sname text NOT NULL,
-                                               grade text NOT NULL,
-                                               gpa double NOT NULL
-                                           ); """
-
-        sqlc_enroll = """CREATE TABLE IF NOT EXISTS enroll (
-                                           eid integer PRIMARY KEY,
-                                           cwid integer,
-                                           cid integer,
-                                           denroll text,
-                                           grade text,
-                                           FOREIGN KEY (cwid) REFERENCES students (cwid)
-                                       );"""
-
-        sqlc_courses = """CREATE TABLE IF NOT EXISTS courses (
-                                                   cid integer PRIMARY KEY,
-                                                   cname text NOT NULL,
-                                                   credits integer NOT NULL,
-                                                   preq text
-                                               );"""
-
-        if atmpconn is not None:
-            c_table(atmpconn, sqlc_students)
-            c_table(atmpconn, sqlc_enroll)
-            c_table(atmpconn, sqlc_courses)
-        else:
-            print("Database Connection Failed.")
-
-        with atmpconn:
-            existing_connection = True
-            cur = atmpconn.cursor()
-            cur.execute("SELECT * FROM enroll")
-            get = cur.fetchall()
-            if not get:
-                c_student(atmpconn, "21612390", "David Sapida", "Senior", "3.5")
-                c_student(atmpconn, "21612391", "Andre Stillo", "Senior", "3.7")
-                c_student(atmpconn, "21612392", "John Jingleheimer", "Senior", "3.0")
-                c_student(atmpconn, "21612393", "James WhoDied", "Senior", "1.2")
-                c_student(atmpconn, "21612394", "Totina HotPizzaRolls", "Senior", "4.0")
-
-                c_courses(atmpconn, "420", "Cooking Totino's Pizza Rolls 101", "3", "N/A")
-                c_courses(atmpconn, "500", "How to not be a failure in life 101", "3", "N/A")
-                c_courses(atmpconn, "012", "How to prevent James from Dying 101", "3", "N/A")
-                c_courses(atmpconn, "069", "How to do the thing 101", "3", "N/A")
-                c_courses(atmpconn, "777", "How to lose your money in Vegas", "3", "N/A")
-
-
-                c_enroll(atmpconn,"0", "21612390", "420", "4/20/2020", "A+")
-                c_enroll(atmpconn,"1", "21612390", "500", "4/01/2020", "B+")
-                c_enroll(atmpconn,"2", "21612390", "012", "3/16/2020", "F")
-                c_enroll(atmpconn,"3", "21612390", "069", "3/20/2020", "B")
-
-                c_enroll(atmpconn,"4", "21612391", "420", "4/20/2020", "A+")
-                c_enroll(atmpconn,"5", "21612391", "500", "4/10/2020", "B-")
-                c_enroll(atmpconn,"6", "21612391", "012", "4/15/2020", "C+")
-
-                c_enroll(atmpconn,"7", "21612392", "500", "1/11/2020", "A-")
-                c_enroll(atmpconn,"8", "21612392", "012", "3/22/2020", "B")
-                c_enroll(atmpconn,"9", "21612392", "069", "4/23/2020", "D")
-
-                c_enroll(atmpconn,"10", "21612393", "420", "2/03/2020", "C-")
-                c_enroll(atmpconn,"11", "21612393", "777", "2/01/2020", "D+")
-
-                c_enroll(atmpconn,"12", "21612394", "420", "4/20/2020", "A+")
-
-        while(existing_connection == True):
-            currentcwid = cwidinp()
-            check = checkdb(atmpconn, currentcwid)
-            if currentcwid != -1 and check == True:
-                cline(atmpconn, currentcwid)
-            elif currentcwid == -1:
-                print("Use the new student function")
-                #Create new student function
-            else:
-                print("There are no records for this CWID in our Database, please type -1 to sign up as a new Student, if your CWID exists please try again.")
-
+        login(atmpconn)
+        
 if __name__ == "__main__":
         main()

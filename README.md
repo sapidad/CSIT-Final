@@ -56,3 +56,16 @@ RecursionError: maximum recursion depth exceeded while calling a Python object
         - Asks Student for Name, Grade (Freshman, Sophomore, Junior, Senior)
         - Generates a 7-Digit CWID at random and sets their GPA to N/A
         - Provide user with the CWID and displays the information asking them to confirm if this information is correct or not.
+
+12/1/2019:
+
+    Implemented:
+        - Fixed a bug where inputting an invalid CWID would cause the next valid CWID to fail
+        - Restructured many of the functions to simplify code and reduce repetitiveness on the user side
+        - Implemented the remaining functions, m, s, x and the new student function. Also added a function tied to - that will log the user out.
+     
+     To Do List:
+        - Error checking for the new student function, possibly making the cwid randomly generated. Adding a confirmation to the new student function.
+        - Improving the search function
+        - Revise command line menu(?)
+        - Adding method to return to main menu from each function (If there's time, I (Andy) will implement this)

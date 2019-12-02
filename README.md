@@ -57,7 +57,7 @@ RecursionError: maximum recursion depth exceeded while calling a Python object
         - Generates a 7-Digit CWID at random and sets their GPA to N/A
         - Provide user with the CWID and displays the information asking them to confirm if this information is correct or not.
 
-12/1/2019:
+12/1/2019 (Andy):
 
     Implemented:
         - Fixed a bug where inputting an invalid CWID would cause the next valid CWID to fail
@@ -70,14 +70,18 @@ RecursionError: maximum recursion depth exceeded while calling a Python object
         - Revise command line menu(?)
         - Adding method to return to main menu from each function (If there's time, I (Andy) will implement this)
 
-12/2/2019:
+12/2/2019 (Andy):
 
     Implemented:
         -CWID is randomly generated when creatinng a new student.
         -Changed formatting on date in enrolled to match generated dates.
         -Improved search function, now loops until the user types 'exit' and searches more effectively.
+        -Restructured program in order to be more concise, weworked cline function.
+        -Improved presentation (it still needs work though).
      
      To Do List:
-        - Error checking for each function.
-        - Revise command line menu(?)
-        - Adding method to return to main menu from each function (If there's time, I (Andy) will implement this)
+        - Design ER diagram and formally type up relational schema.
+        - Improve presentation.
+        - Ask professor for advice involviong foreign keys (cid in table enroll).
+        - Try to think of ways to refine the program, I'm out of ideas.
+        

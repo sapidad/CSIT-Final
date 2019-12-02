@@ -3,6 +3,7 @@ from sqlite3 import Error
 from datetime import date
 from random import randint
 import re
+import string
 
 
 def estconn(db):
@@ -75,7 +76,7 @@ def checkdb(conn, cwid):
 def cwidinp():
     while (True):
         try:
-            cwid = str(input("Student ID: "))
+            cwid = int(input("Student ID: "))
             return cwid
         except ValueError:
             print("Not a valid Student ID, please try again.")
@@ -91,21 +92,42 @@ def cwidgen(con):
             cur.close()
             return gcwid
 
-def gpainp():
-    while (True):
-        try:
-            gpa = float(input("GPA: "))
-            return gpa
-        except ValueError:
-            print("Not a valid GPA value, please try again.")
-
 def n_student(con):
     while True:
         ncwid = cwidgen(con)
-        nsname = str(input("Student name: "))
-        ngrade = str(input("Grade level: "))
-        ngpa = gpainp()
-        print("\nYour information is:\ncwid: " + str(ncwid) + "\nname: " + nsname + "\ngrade: " + ngrade + "\nGPA: " + str(ngpa))
+        while True:
+            nsname = str(input("Student name: "))
+            for i in range(len(nsname)):
+                if nsname[i].isdigit()==True:
+                    print("Student names cannot have numbers in them, please try again")
+                    done = False
+                    break
+                else:
+                    done = True
+            if done == True:
+                break
+                
+        while True:
+            ngrade = str(input("Grade level (please input only freshman, sophmore, junior or senior): "))
+            if (ngrade.lower() == 'freshman'):
+                break
+            elif (ngrade.lower() == 'sophmore'):
+                break
+            elif (ngrade.lower() == 'junior'):
+                break
+            elif (ngrade.lower() == 'senior'):
+                break
+            else:
+                print("Input must be freshman, sophmore, junior or senior.")
+                
+        while True:
+            try:
+                gpa = float(input("GPA: "))
+                return gpa
+            except ValueError:
+                print("Not a valid GPA value, please try again.")
+                
+        print("\nYour information is:\ncwid: " + str(ncwid) + "\nname: " + string.capwords(nsname) + "\ngrade: " + ngrade.capitalize() + "\nGPA: " + str(ngpa))
         c = str(input("Is this correct? Please type Y or N: "))
         if c.lower() == 'y':
             c_student(con, ncwid, nsname, ngrade, ngpa)
@@ -213,38 +235,33 @@ def welcome(con, cwid):
          
 def cline(con, cwid):
     inp = str(input("Please type in a command: "))
-    for i in range(len(inp)):
-        if inp[i].isdigit() == True:
-            print("\nInteger values are not valid commands, try again.")
-            cline(con, cwid)
-
-        if inp == 'commands':
-            print("L: Lists all Courses")
-            print("E: Enrolls Student(s) into a Course")
-            print("W: Withdraw Class")
-            print("S: Search for a Course")
-            print("M: View your Classes")
-            print("X: Exit")
-            print("-: Log Out")
-        elif not inp.strip():
-            print("Not a valid command, try again.")
-        elif inp.lower() == 'l':
-            list(con)
-        elif inp.lower() == 'e':
-            eclass(con, cwid)
-        elif inp.lower() == 'w':
-            wclass(con, cwid)
-        elif inp.lower() == 's':
-            sclass(con)
-        elif inp.lower() == 'm':
-            mclass(con, cwid)
-        elif inp.lower() == 'x':
-            exitapp(con)
-        elif inp == '-': #function i added to return to the login
-            login(con)
-        else:
-            print("Not a valid command, try again.")
-        cline(con, cwid)
+    if inp.isdigit() == True:
+        print("Integer values are not valid commands, try again.\n")
+    elif inp == 'commands':
+        print("L: Lists all Courses")
+        print("E: Enrolls Student(s) into a Course")
+        print("W: Withdraw Class")
+        print("S: Search for a Course")
+        print("M: View your Classes")
+        print("X: Exit")
+        print("-: Log Out\n")
+    elif inp.lower() == 'l':
+        list(con)
+    elif inp.lower() == 'e':
+        eclass(con, cwid)
+    elif inp.lower() == 'w':
+        wclass(con, cwid)
+    elif inp.lower() == 's':
+        sclass(con)
+    elif inp.lower() == 'm':
+        mclass(con, cwid)
+    elif inp.lower() == 'x':
+        exitapp(con)
+    elif inp == '-': #function i added to return to the login
+        login(con)
+    else:
+        print("Not a valid command, try again.\n")
+    cline(con, cwid)
 
 def list(con):
     cur = con.cursor()

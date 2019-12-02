@@ -296,40 +296,48 @@ def eclass(conn, cwid):
 
 def wclass(conn, cwid):
     while True:
-       gcid = input("Please enter a Course ID or type 'exit': ")
-       if gcid.isalpha() and gcid == "exit":
-           print("Returning to main menu...\n")
-           break
-       elif gcid.isdigit() == True:
-           cur = conn.cursor()
-           cur.execute("SELECT cid FROM courses WHERE cid=?", (gcid,))
-           records = cur.fetchall()
-           if not records:
-               print("Course does not exist, please try again.")
-               cur.close()
-           else:
-               cur.execute("SELECT cid, cwid FROM enroll WHERE cwid=? AND cid=?", (cwid, str(gcid)))
-               cpis = cur.fetchall()
-               if not cpis:
-                   print("You are not registered for this class!")
-                   cur.close()
-                   wclass(conn, cwid)
-               else:
-                   with conn:
-                       cur.execute("SELECT E.cwid, E.cid, C.cname FROM enroll E, courses C WHERE E.cid = C.cid AND E.cwid=? AND E.cid=?",(cwid, str(gcid),))
-                       get = cur.fetchall()
-                       print(get)
-                       c = str(input("Are you sure you want to withdraw from this class? Please type Y or N: "))
-                       if c.lower() == 'y':
-                           with conn:
-                               cur.execute("DELETE FROM enroll WHERE cwid=? AND cid=?", (cwid, str(gcid),))
-                               cur.close()
-                               print("Withdrawal Successful")
-                       elif c.lower() == 'n':
-                           print("Withdrawal Failed.")
-                           cur.close()
-       else:
-           print("Invalid Course ID, please try again.")
+        cur = conn.cursor()
+        cur.execute("SELECT cid FROM enroll WHERE cwid=?", (cwid,))
+        erecords = cur.fetchall()
+        if not erecords:
+            print("You are not enrolled in any classes, please enter the 'E' command to enroll in a class or 'L' to view all available classes!")
+            break
+        else:
+            gcid = input("Please enter a Course ID or type 'exit': ")
+            if gcid.isalpha() and gcid == "exit":
+                print("Returning to main menu...\n")
+                break
+            elif gcid.isdigit() == True:
+                cur = conn.cursor()
+                cur.execute("SELECT cid FROM courses WHERE cid=?", (gcid,))
+                records = cur.fetchall()
+                if not records:
+                    print("Course does not exist, please try again.")
+                    cur.close()
+                else:
+                    cur.execute("SELECT cid, cwid FROM enroll WHERE cwid=? AND cid=?", (cwid, str(gcid)))
+                    cpis = cur.fetchall()
+                    if not cpis:
+                        print("You are not registered for this class!")
+                        cur.close()
+                        wclass(conn, cwid)
+                    else:
+                        with conn:
+                            cur.execute("SELECT E.cwid, E.cid, C.cname FROM enroll E, courses C WHERE E.cid = C.cid AND E.cwid=? AND E.cid=?",
+                                (cwid, str(gcid),))
+                            get = cur.fetchall()
+                            print(get)
+                            c = str(input("Are you sure you want to withdraw from this class? Please type Y or N: "))
+                            if c.lower() == 'y':
+                                with conn:
+                                    cur.execute("DELETE FROM enroll WHERE cwid=? AND cid=?", (cwid, str(gcid),))
+                                    cur.close()
+                                    print("Withdrawal Successful")
+                            elif c.lower() == 'n':
+                                print("Withdrawal Failed.")
+                                cur.close()
+            else:
+                print("Invalid Course ID, please try again.")
 
 
 def sclass(con):

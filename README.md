@@ -95,6 +95,6 @@ RecursionError: maximum recursion depth exceeded while calling a Python object
         -Fixed up creating New Student Function (with restrictions)
         -New Students/Not Enrolled Students will be prompted that they have no courses in their account if they are not enrolled in any classes when using M or W commands.
         
-    To Do list: 
+    To Do List: 
         -Finding/Fixing Bugs
         -Possible additional implementations

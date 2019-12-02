@@ -73,7 +73,9 @@ RecursionError: maximum recursion depth exceeded while calling a Python object
 12/2/2019 (Andy):
 
     Implemented:
-        -CWID is randomly generated when creatinng a new student.
+        -CWID is randomly generated when creatinng a new student. Also added the confirmation, as well as formatting to the entries, as well as adding some constraints to entries.
+        -Fixed errors within the new student function.
+        -Closed cursors all cursors at the end of most functions.
         -Changed formatting on date in enrolled to match generated dates.
         -Improved search function, now loops until the user types 'exit' and searches more effectively.
         -Restructured program in order to be more concise, weworked cline function.
@@ -84,4 +86,5 @@ RecursionError: maximum recursion depth exceeded while calling a Python object
         - Improve presentation.
         - Ask professor for advice involviong foreign keys (cid in table enroll).
         - Try to think of ways to refine the program, I'm out of ideas.
+        - Bug fixing.
         

@@ -1,6 +1,7 @@
 import sqlite3
 from sqlite3 import Error
 from datetime import date
+from random import randint
 import re
 
 
@@ -26,7 +27,6 @@ def c_student(conn, cwid, sname, grade, gpa):
     student = (cwid, sname, grade, gpa)
     cur = conn.cursor()
     cur.execute("INSERT OR IGNORE INTO students(cwid,sname,grade,gpa) VALUES(?,?,?,?)", student)
-    print("Registration successful");
     return cur.lastrowid
 
 def c_enroll(conn, eid, cwid, cid, denroll, grade):
@@ -50,18 +50,22 @@ def d_enroll(conn, cwid, cid):
     if c.lower() == 'y':
         with conn:
             cur.execute("DELETE FROM enroll WHERE cwid=? AND cid=?", (cwid, str(cid),))
+            cur.close()
             print("Withdrawal Successful")
     elif c.lower() == 'n':
         print("Withdrawal Failed.")
+        cur.close()
         cline(conn, cwid)
     else:
         print("Invalid option, please try again.")
+        cur.close()
         d_enroll(conn, cwid, cid)
 
 def checkdb(conn, cwid):
     cur = conn.cursor()
     cur.execute("SELECT cwid FROM students WHERE cwid=?", (cwid,))
     records = cur.fetchall()
+    cur.close()
     if not records:
         return False
     else:
@@ -71,10 +75,21 @@ def checkdb(conn, cwid):
 def cwidinp():
     while (True):
         try:
-            cwid = int(input("Student ID: "))
+            cwid = str(input("Student ID: "))
             return cwid
         except ValueError:
             print("Not a valid Student ID, please try again.")
+
+def cwidgen(con):
+    while True:
+        gcwid = randint(1000000, 9999999)
+        cur = con.cursor()
+        cur.execute("SELECT COUNT(*) FROM students WHERE cwid=? GROUP BY cwid", (gcwid,))
+        exist = cur.fetchone()
+        if exist is None:
+            print("cwid generated! Your cwid is: " + str(gcwid) + ".")
+            cur.close()
+            return gcwid
 
 def gpainp():
     while (True):
@@ -85,11 +100,23 @@ def gpainp():
             print("Not a valid GPA value, please try again.")
 
 def n_student(con):
-    ncwid = cwidinp()
-    nsname = str(input("Student name: "))
-    ngrade = str(input("Grade level: "))
-    ngpa = gpainp()
-    c_student(con, ncwid, nsname, ngrade, ngpa)
+    while True:
+        ncwid = cwidgen(con)
+        nsname = str(input("Student name: "))
+        ngrade = str(input("Grade level: "))
+        ngpa = gpainp()
+        print("\nYour information is:\ncwid: " + str(ncwid) + "\nname: " + nsname + "\ngrade: " + ngrade + "\nGPA: " + str(ngpa))
+        c = str(input("Is this correct? Please type Y or N: "))
+        if c.lower() == 'y':
+            c_student(con, ncwid, nsname, ngrade, ngpa)
+            print("You have been registered in the database! Log in to enroll in a course.")
+            login(con)
+        elif c.lower() == 'n':
+            print("Enter -1 to re-enter your information.")
+            login(con)
+        else:
+            print("Invalid option, enter -1 to re-enter your information.")
+            login(con)
 
 def login(con):
     sqlc_students = """ CREATE TABLE IF NOT EXISTS students (
@@ -141,23 +168,24 @@ def login(con):
             c_courses(con, "777", "How to lose your money in Vegas", "3", "N/A")
 
 
-            c_enroll(con,"0", "21612390", "420", "4/20/2020", "A+")
-            c_enroll(con,"1", "21612390", "500", "4/01/2020", "B+")
-            c_enroll(con,"2", "21612390", "012", "3/16/2020", "F")
-            c_enroll(con,"3", "21612390", "069", "3/20/2020", "B")
+            c_enroll(con,"0", "21612390", "420", "4-20-2020", "A+")
+            c_enroll(con,"1", "21612390", "500", "4-01-2020", "B+")
+            c_enroll(con,"2", "21612390", "012", "3-16-2020", "F")
+            c_enroll(con,"3", "21612390", "069", "3-20-2020", "B")
 
-            c_enroll(con,"4", "21612391", "420", "4/20/2020", "A+")
-            c_enroll(con,"5", "21612391", "500", "4/10/2020", "B-")
-            c_enroll(con,"6", "21612391", "012", "4/15/2020", "C+")
+            c_enroll(con,"4", "21612391", "420", "4-20-2020", "A+")
+            c_enroll(con,"5", "21612391", "500", "4-10-2020", "B-")
+            c_enroll(con,"6", "21612391", "012", "4-15-2020", "C+")
 
-            c_enroll(con,"7", "21612392", "500", "1/11/2020", "A-")
-            c_enroll(con,"8", "21612392", "012", "3/22/2020", "B")
-            c_enroll(con,"9", "21612392", "069", "4/23/2020", "D")
+            c_enroll(con,"7", "21612392", "500", "1-11-2020", "A-")
+            c_enroll(con,"8", "21612392", "012", "3-22-2020", "B")
+            c_enroll(con,"9", "21612392", "069", "4-23-2020", "D")
 
-            c_enroll(con,"10", "21612393", "420", "2/03/2020", "C-")
-            c_enroll(con,"11", "21612393", "777", "2/01/2020", "D+")
+            c_enroll(con,"10", "21612393", "420", "2-03-2020", "C-")
+            c_enroll(con,"11", "21612393", "777", "2-01-2020", "D+")
 
-            c_enroll(con,"12", "21612394", "420", "4/20/2020", "A+")
+            c_enroll(con,"12", "21612394", "420", "4-20-2020", "A+")
+        cur.close()
 
     while(existing_connection == True):
         print("\nEnter your student ID or enter -1 to register as a new student.")
@@ -179,6 +207,7 @@ def welcome(con, cwid):
     cwid = re.sub('[^A-Za-z0-9]+', '', s)
     print("\nWelcome, please type in a command or type commands for help!")
     print("CWID: " + cwid)
+    cur.close()
     cline(con, cwid)
 
          
@@ -221,6 +250,7 @@ def list(con):
     cur = con.cursor()
     cur.execute("SELECT * FROM courses")
     courserecord = cur.fetchall()
+    cur.close()
     for all in courserecord:
         print(all)
 
@@ -235,6 +265,7 @@ def eclass(conn, cwid):
     records = cur.fetchall()
     if not records:
         print("Course does not exist, please try again.")
+        cur.close()
         eclass(conn, cwid)
     else:
         cur.execute("SELECT cid, cwid FROM enroll WHERE cwid=? AND cid=?", (cwid, str(gcid)))
@@ -245,9 +276,11 @@ def eclass(conn, cwid):
         if not cpis:
             with conn:
                 c_enroll(conn, str(eid), cwid, str(gcid), str(date.today()), "N/A")
-            print("Enrollment Complete!")
+                cur.close()
+                print("Enrollment Complete!")
         else:
             print("You are currently registered for this class!")
+            cur.close()
             eclass(conn, cwid)
 
 def wclass(conn, cwid):
@@ -262,15 +295,18 @@ def wclass(conn, cwid):
     records = cur.fetchall()
     if not records:
         print("Course does not exist, please try again.")
+        cur.close()
         wclass(conn, cwid)
     else:
         cur.execute("SELECT cid, cwid FROM enroll WHERE cwid=? AND cid=?", (cwid, str(gcid)))
         cpis = cur.fetchall()
         if not cpis:
             print("You are not registered for this class!")
+            cur.close()
             wclass(conn, cwid)
         else:
             with conn:
+                cur.close()
                 d_enroll(conn, cwid, gcid)
 
 def sclass(con):
@@ -278,6 +314,7 @@ def sclass(con):
     cur = con.cursor()
     cur.execute("SELECT cname FROM courses WHERE cname LIKE '%s%%'" % gcname)
     courserecord = cur.fetchall()
+    cur.close()
     for all in courserecord:
         print(all)
 
@@ -285,6 +322,7 @@ def mclass(con, cwid):
     cur = con.cursor()
     cur.execute("SELECT c.cname, c.cid FROM courses c, enroll e WHERE E.cwid=? AND e.cid=c.cid", (cwid,))
     courserecord = cur.fetchall()
+    cur.close()
     for all in courserecord:
         print(all)
 

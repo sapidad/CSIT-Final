@@ -2,7 +2,7 @@
 
 CHANGE LOG:
 
-11/11/2019: Created main, connection, creating table functions however getting an error below.
+11/11/2019 (David) : Created main, connection, creating table functions however getting an error below.
 
 Traceback (most recent call last):
   File "<pyshell#0>", line 1, in <module>
@@ -20,7 +20,7 @@ Traceback (most recent call last):
     conn = sqlite3.connect(db)
 RecursionError: maximum recursion depth exceeded while calling a Python object
 
-11/18/2019:
+11/18/2019 (David):
 
     Implemented:
         - Database Established
@@ -35,7 +35,7 @@ RecursionError: maximum recursion depth exceeded while calling a Python object
         - Test to make sure everything is working as intended.
         - Realized that every other attempt at a command closes the program, will do a constant check for everything that isnt one of the commands in the command list to redirect user to always try again.
         
-11/20/2019:
+11/20/2019 (David):
 
     Implemented:
         - Fixed multiple bugs regarding termination of the command line after multiple failures/successes after failures
@@ -88,3 +88,13 @@ RecursionError: maximum recursion depth exceeded while calling a Python object
         - Try to think of ways to refine the program, I'm out of ideas.
         - Bug fixing.
         
+12/2/2019 (David):
+
+    Implemented:
+        -Added exit functionality in Withdraw and Enroll commands
+        -Fixed up creating New Student Function (with restrictions)
+        -New Students/Not Enrolled Students will be prompted that they have no courses in their account if they are not enrolled in any classes when using M or W commands.
+        
+    To Do list: 
+        -Finding/Fixing Bugs
+        -Possible additional implementations

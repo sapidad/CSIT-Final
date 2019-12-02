@@ -69,3 +69,15 @@ RecursionError: maximum recursion depth exceeded while calling a Python object
         - Improving the search function
         - Revise command line menu(?)
         - Adding method to return to main menu from each function (If there's time, I (Andy) will implement this)
+
+12/2/2019:
+
+    Implemented:
+        -CWID is randomly generated when creatinng a new student.
+        -Changed formatting on date in enrolled to match generated dates.
+     
+     To Do List:
+        - Error checking for each function.
+        - Improving the search function
+        - Revise command line menu(?)
+        - Adding method to return to main menu from each function (If there's time, I (Andy) will implement this)

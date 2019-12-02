@@ -310,13 +310,19 @@ def wclass(conn, cwid):
                 d_enroll(conn, cwid, gcid)
 
 def sclass(con):
-    gcname = str(input("Enter a string to search the course list for: "))
-    cur = con.cursor()
-    cur.execute("SELECT cname FROM courses WHERE cname LIKE '%s%%'" % gcname)
-    courserecord = cur.fetchall()
-    cur.close()
-    for all in courserecord:
-        print(all)
+    while True:
+        gcname = str(input("Enter a string to search the course list for, or enter 'exit' to return to the main menu: "))
+        if gcname == "exit":
+            print("Returning to main menu...\n")
+            break
+        else:
+            gcname = ("%" + gcname + "%")
+            cur = con.cursor()
+            cur.execute("SELECT cname FROM courses WHERE cname LIKE ?", (gcname,))
+            courserecord = cur.fetchall()
+            cur.close()
+            for all in courserecord:
+                print(all)
 
 def mclass(con, cwid):
     cur = con.cursor()

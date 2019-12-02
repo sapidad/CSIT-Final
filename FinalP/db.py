@@ -92,6 +92,14 @@ def cwidgen(con):
             cur.close()
             return gcwid
 
+def gpainp():
+    while True:
+        try:
+            gpa = float(input("GPA: "))
+            return gpa
+        except ValueError:
+            print("Not a valid GPA value, please try again.")
+
 def n_student(con):
     while True:
         ncwid = cwidgen(con)
@@ -109,24 +117,13 @@ def n_student(con):
                 
         while True:
             ngrade = str(input("Grade level (please input only freshman, sophmore, junior or senior): "))
-            if (ngrade.lower() == 'freshman'):
-                break
-            elif (ngrade.lower() == 'sophmore'):
-                break
-            elif (ngrade.lower() == 'junior'):
-                break
-            elif (ngrade.lower() == 'senior'):
+            if (ngrade.lower() == 'freshman' or ngrade.lower() == 'sophmore' or ngrade.lower() == 'junior' or ngrade.lower() == 'senior'):
                 break
             else:
                 print("Input must be freshman, sophmore, junior or senior.")
-                
-        while True:
-            try:
-                gpa = float(input("GPA: "))
-                return gpa
-            except ValueError:
-                print("Not a valid GPA value, please try again.")
-                
+
+        ngpa = gpainp()
+        
         print("\nYour information is:\ncwid: " + str(ncwid) + "\nname: " + string.capwords(nsname) + "\ngrade: " + ngrade.capitalize() + "\nGPA: " + str(ngpa))
         c = str(input("Is this correct? Please type Y or N: "))
         if c.lower() == 'y':

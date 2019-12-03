@@ -82,12 +82,12 @@ def sname():
         return string.capwords(name)
 
 def grade():
-    g = input("Grade: ")
-    if g.lower() == 'freshman' or g.lower() == 'sophomore' or g.lower() == 'junior' or g.lower() == 'senior':
-        return string.capwords(g)
-    else:
-        print("Entries can only be Freshman, Sophomore, Junior, Senior")
-        grade()
+    while True:
+        g = input("Grade: ")
+        if g.lower() == 'freshman' or g.lower() == 'sophomore' or g.lower() == 'junior' or g.lower() == 'senior':
+            return string.capwords(g)
+        else:
+            print("Entries can only be Freshman, Sophomore, Junior, Senior")
 
 def gpa():
     while True:

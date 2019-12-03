@@ -82,7 +82,6 @@ RecursionError: maximum recursion depth exceeded while calling a Python object
         -Improved presentation (it still needs work though).
      
      To Do List:
-        - Design ER diagram and formally type up relational schema.
         - Improve presentation.
         - Ask professor for advice involviong foreign keys (cid in table enroll).
         - Try to think of ways to refine the program, I'm out of ideas.
@@ -98,3 +97,11 @@ RecursionError: maximum recursion depth exceeded while calling a Python object
     To Do List: 
         -Finding/Fixing Bugs
         -Possible additional implementations
+
+12/3/2019 (Andy):
+
+    Implemented:
+        -Fixed a bug that caused the new student function to throw an error after a invalid grade and gpa were passed.
+        
+    To Do List: 
+        -Finding/Fixing Bugs

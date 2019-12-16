@@ -1,5 +1,7 @@
 # CSIT-Final
 
+Authors of this Project: David Sapida and Andre Stillo
+
 CHANGE LOG:
 
 11/11/2019 (David) : Created main, connection, creating table functions however getting an error below.

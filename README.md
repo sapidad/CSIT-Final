@@ -106,7 +106,7 @@ RecursionError: maximum recursion depth exceeded while calling a Python object
     To Do List: 
         -Finding/Fixing Bugs
 
-12/16/2019 (Andy):
+12/15/2019 (Andy):
 
     Implemented:
         -Changed the name of grade in students table to gradelv. This is because a variable grade already exists in Enrolled. 
@@ -115,3 +115,15 @@ RecursionError: maximum recursion depth exceeded while calling a Python object
     To Do List: 
         -Finding/Fixing Bugs
         -Ask david if we should keep the preq attribute in Courses.
+
+
+12/16/2019 (Andy & David):
+
+    Implemented:
+        -Fixed a bug that would allow users to enter a name as only numbers. 
+        -Fixed a bug that would cause multiple outputs of the same string in the witdrawal method (wclass)
+        -Changed preq attribute to professor (attribute is never used, moreso done for realism)
+        -Edited the classes and students entries to their final iterations (RIP James)
+        
+    To Do List: 
+        -Finding/Fixing Bugs, but overall we are done.

@@ -27,7 +27,7 @@ def c_table(conn, sql_table):
 def c_student(conn, cwid, sname, grade, gpa):
     student = (cwid, sname, grade, gpa)
     cur = conn.cursor()
-    cur.execute("INSERT OR IGNORE INTO students(cwid,sname,grade,gpa) VALUES(?,?,?,?)", student)
+    cur.execute("INSERT OR IGNORE INTO students(cwid,sname,gradelv,gpa) VALUES(?,?,?,?)", student)
     return cur.lastrowid
 
 def c_enroll(conn, eid, cwid, cid, denroll, grade):
@@ -81,9 +81,9 @@ def sname():
     else:
         return string.capwords(name)
 
-def grade():
+def gradelv():
     while True:
-        g = input("Grade: ")
+        g = input("Grade level: ")
         if g.lower() == 'freshman' or g.lower() == 'sophomore' or g.lower() == 'junior' or g.lower() == 'senior':
             return string.capwords(g)
         else:
@@ -103,14 +103,14 @@ def gpa():
 def n_student(con):
         ncwid = cwidgen(con)
         nsname = sname()
-        ngrade = grade()
+        ngradelv = gradelv()
         ngpa = gpa()
 
-        print("\nYour Information is:\nCWID: " + str(ncwid) + "\nName: " + nsname + "\nGrade: " + ngrade + "\nGPA: " + str(ngpa))
+        print("\nYour Information is:\nCWID: " + str(ncwid) + "\nName: " + nsname + "\nGrade level: " + ngradelv + "\nGPA: " + str(ngpa))
         c = str(input("Is this correct? Please type Y or N: "))
 
         if c.lower() == 'y':
-            c_student(con, ncwid, nsname, ngrade, ngpa)
+            c_student(con, ncwid, nsname, ngradelv, ngpa)
             print("You have been registered in the database! Log in to enroll into a course.")
             login(con)
         elif c.lower() == 'n':
@@ -124,7 +124,7 @@ def login(con):
     sqlc_students = """ CREATE TABLE IF NOT EXISTS students (
                                                cwid integer PRIMARY KEY,
                                                sname text NOT NULL,
-                                               grade text NOT NULL,
+                                               gradelv text NOT NULL,
                                                gpa double NOT NULL
                                            ); """
 

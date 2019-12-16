@@ -279,7 +279,7 @@ def eclass(conn, cwid):
                     cur.execute("SELECT cid, cname FROM courses WHERE cid=?", (str(gcid),))
                     get = cur.fetchall()
                     print(get)
-                    c = str(input("Are you sure you want to withdraw from this class? Please type Y or N: "))
+                    c = str(input("Are you sure you want to enroll in this class? Please type Y or N: "))
                     if c.lower() == 'y':
                         with conn:
                             c_enroll(conn, str(eid), cwid, str(gcid), str(date.today()), "N/A")
